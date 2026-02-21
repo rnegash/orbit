@@ -1,5 +1,4 @@
-import { navigate } from "expo-router/build/global-state/routing";
-import { Text, View, Button } from "react-native";
+import { View, Text, Button } from "tamagui";
 
 export default function State() {
   return (
@@ -10,8 +9,8 @@ export default function State() {
         alignItems: "center",
       }}
     >
-      <Text>comfort level</Text>
-      <Button title="Exercise" />
+      <Text>Add workout</Text>
+      <Button> Add</Button>
     </View>
   );
 }

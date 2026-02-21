@@ -1,5 +1,6 @@
 import { Link } from "expo-router";
 import { Text, View, Pressable } from "react-native";
+import { XStack, Button } from "tamagui";
 
 export default function Index() {
   return (
@@ -10,17 +11,16 @@ export default function Index() {
         alignItems: "center",
       }}
     >
-      <Text>comfort level</Text>
-      <Link href="/log/state" asChild>
-        <Pressable>
-          <Text>State</Text>
-        </Pressable>
-      </Link>
-      <Link href="/log/workout" asChild>
-        <Pressable>
-          <Text>Workout</Text>
-        </Pressable>
-      </Link>
+      <Text>Add log</Text>
+
+      <XStack gap="$2">
+        <Link href="/log/state" asChild>
+          <Button>State</Button>
+        </Link>
+        <Link href="/log/workout" asChild>
+          <Button>Workout </Button>
+        </Link>
+      </XStack>
     </View>
   );
 }
