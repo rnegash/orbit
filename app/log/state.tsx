@@ -1,6 +1,43 @@
-import { View, Text, Button, Input, Slider, YStack, Select } from "tamagui";
+import React from "react";
+import { Check as CheckIcon } from "@tamagui/lucide-icons";
+import {
+  View,
+  Text,
+  Button,
+  Input,
+  Slider,
+  YStack,
+  Label,
+  XStack,
+  Checkbox,
+} from "tamagui";
 
-const painTypes = ["sharp", "throbbing", "pressing"];
+const painTypes = [
+  "sharp",
+  "dull",
+  "burning",
+  "stiffness",
+  "cramping",
+  "throbbing",
+  "pressing",
+  "cramping",
+  "tenderness",
+];
+
+const PainTypeSelect = () => {
+  return painTypes.map((painType, idx) => (
+    <XStack width={300} gap="$4" alignContent="center">
+      <Checkbox id={painType} key={idx} value={painType}>
+        <Checkbox.Indicator>
+          <CheckIcon />
+        </Checkbox.Indicator>
+      </Checkbox>
+      <Label size={"$3"} htmlFor={painType}>
+        {painType}
+      </Label>
+    </XStack>
+  ));
+};
 
 export default function State() {
   return (
@@ -22,16 +59,8 @@ export default function State() {
           </Slider.Track>
           <Slider.Thumb circular index={0} />
         </Slider>
-        <Text>Type of pain:</Text>
-        <Select defaultValue="">
-          <Select.Trigger>
-            <Select.Value placeholder="Select..." />
-          </Select.Trigger>
-          {painTypes.map((painType, idx) => (
-            <Select.Item key={idx} index={idx} value={painType} />
-          ))}
-        </Select>
-
+        <Label htmlFor="pain-type-select">Type of pain:</Label>
+        <PainTypeSelect />
         <Text>Trigger:</Text>
         <Input size="$4" borderWidth={2} />
 
