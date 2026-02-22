@@ -1,7 +1,6 @@
 import React from "react";
 import { Check as CheckIcon } from "@tamagui/lucide-icons";
 import {
-  Text,
   Button,
   Input,
   Slider,

@@ -3,6 +3,7 @@ import { StatusBar } from "expo-status-bar";
 import { createTamagui, TamaguiProvider } from "tamagui";
 import { defaultConfig } from "@tamagui/config/v5"; // for quick config install this
 import { themes } from "../lib/themes";
+
 const config = createTamagui({ ...defaultConfig, themes });
 
 export default function RootLayout() {
