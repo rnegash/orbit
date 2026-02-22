@@ -31,6 +31,9 @@ Thumbs.db
 .env
 .env.local
 
+# Expo
+.expo/
+
 # Build
 build/
 dist/
