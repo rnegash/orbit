@@ -26,7 +26,7 @@ const painTypes = [
 export default function State() {
   return (
     <ScrollView>
-      <YStack gap={"$4"} padding={"$6"} paddingBottom={"$10"}>
+      <YStack gap="$4" padding="$6" paddingBottom="$10">
         <Text>location:</Text>
         <Input size="$4" borderWidth={2} />
         <Text>level:</Text>
@@ -40,13 +40,13 @@ export default function State() {
         <Label htmlFor="pain-type-select">Type of pain:</Label>
         <YStack gap="$4">
           {painTypes.map((painType) => (
-            <XStack gap="$4" alignItems="center">
-              <Checkbox id={painType} value={painType} size={"$6"}>
+            <XStack key={painType} gap="$4" alignItems="center">
+              <Checkbox id={painType} value={painType} size="$6">
                 <Checkbox.Indicator>
                   <CheckIcon />
                 </Checkbox.Indicator>
               </Checkbox>
-              <Label size={"$3"} htmlFor={painType}>
+              <Label size="$3" htmlFor={painType}>
                 {painType}
               </Label>
             </XStack>

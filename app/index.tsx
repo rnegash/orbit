@@ -4,7 +4,7 @@ import { XStack, Button, H1, View } from "tamagui";
 export default function Index() {
   return (
     <View
-      gap={"$10"}
+      gap="$10"
       style={{
         flex: 1,
         justifyContent: "center",

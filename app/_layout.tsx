@@ -7,7 +7,7 @@ const config = createTamagui({ ...defaultConfig, themes });
 
 export default function RootLayout() {
   return (
-    <TamaguiProvider defaultTheme={"light"} config={config}>
+    <TamaguiProvider defaultTheme="light" config={config}>
       <Tabs>
         <Tabs.Screen name="index" />
         <Tabs.Screen name="logList" />

@@ -1,5 +1,5 @@
-import Slider from "@react-native-community/slider";
-import { Text, View, Button, FlatList } from "react-native";
+import { FlatList } from "react-native";
+import { Text, View } from "tamagui";
 
 export default function LogList() {
   return (
