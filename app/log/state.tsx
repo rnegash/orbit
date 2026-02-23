@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Check as CheckIcon } from "@tamagui/lucide-icons";
 import {
   Button,
@@ -8,6 +8,8 @@ import {
   Label,
   XStack,
   Checkbox,
+  TextArea,
+  Text,
 } from "tamagui";
 import { LogView } from "@/components/logView";
 
@@ -22,25 +24,36 @@ const painTypes = [
   "tenderness",
 ];
 
+const initialPainLevel = 5;
+
 export default function State() {
+  const [painLevel, setPainLevel] = useState(initialPainLevel);
   return (
     <LogView>
-      <Label htmlFor="pain-location">location:</Label>
+      <Label htmlFor="pain-location">Pain location</Label>
       <Input id="pain-location" size="$4" borderWidth={2} />
 
-      <Label htmlFor="pain-level">level:</Label>
-      <Slider id="pain-level" size="$4" defaultValue={[5]} max={10} step={1}>
+      <Label htmlFor="pain-level">Pain level</Label>
+      <Slider
+        id="pain-level"
+        size="$4"
+        defaultValue={[initialPainLevel]}
+        max={10}
+        step={1}
+        onValueChange={(e) => setPainLevel(e[0])}
+      >
         <Slider.Track>
           <Slider.TrackActive />
         </Slider.Track>
         <Slider.Thumb circular index={0} />
       </Slider>
+      <Text>{painLevel}/10</Text>
 
-      <Label htmlFor="pain-type">Type of pain:</Label>
-      <YStack gap="$4">
+      <Label htmlFor="pain-type">Types of pain:</Label>
+      <YStack gap="$4" id="pain-type">
         {painTypes.map((painType) => (
           <XStack key={painType} gap="$4" alignItems="center">
-            <Checkbox id="pain-type" value={painType} size="$6">
+            <Checkbox id={painType} value={painType} size="$6">
               <Checkbox.Indicator>
                 <CheckIcon />
               </Checkbox.Indicator>
@@ -53,7 +66,7 @@ export default function State() {
       </YStack>
 
       <Label htmlFor="pain-trigger">Trigger:</Label>
-      <Input id="pain-trigger" size="$4" borderWidth={2} />
+      <TextArea id="pain-trigger" size="$4" borderWidth={2} />
 
       <Button>Add log</Button>
     </LogView>
