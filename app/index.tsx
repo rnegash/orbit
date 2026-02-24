@@ -1,7 +1,17 @@
 import { Link } from "expo-router";
+import { useSQLiteContext } from "expo-sqlite";
+import { useEffect } from "react";
 import { XStack, Button, H1, View } from "tamagui";
 
 export default function Index() {
+  const db = useSQLiteContext();
+  useEffect(() => {
+    const test = async () => {
+      const result = await db.getAllAsync("SELECT * FROM painLog");
+      console.log(result);
+    };
+    test();
+  }, []);
   return (
     <View
       gap="$10"
