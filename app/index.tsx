@@ -7,11 +7,13 @@ export default function Index() {
   const db = useSQLiteContext();
   useEffect(() => {
     const test = async () => {
-      const result = await db.getAllAsync("SELECT * FROM painLog");
-      console.log(result);
+      const pain = await db.getAllAsync("SELECT * FROM painLog");
+      const workout = await db.getAllAsync("SELECT * FROM workoutLog");
+      console.log(pain);
+      console.log(workout);
     };
     test();
-  }, []);
+  }, [db]);
   return (
     <View
       gap="$10"
