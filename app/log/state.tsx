@@ -12,6 +12,8 @@ import {
   Text,
 } from "tamagui";
 import { LogView } from "@/components/logView";
+import { useSQLiteContext } from "expo-sqlite";
+import { table } from "@/lib/db";
 
 const painTypes = [
   "sharp",
@@ -24,20 +26,31 @@ const painTypes = [
   "tenderness",
 ];
 
-const initialPainLevel = 5;
-
 export default function State() {
-  const [painLevel, setPainLevel] = useState(initialPainLevel);
+  const db = useSQLiteContext();
+  const [painLocationInput, setPainLocationInput] = useState("");
+  const [painLevel, setPainLevel] = useState<number>();
+  const [painTypeInput, setPainTypeInput] = useState<string[]>([]);
+  const [painTriggerInput, setPainTriggerInput] = useState("");
+
+  const formattedPainTypeInput = painTypeInput.join(", ");
+
   return (
     <LogView>
       <Label htmlFor="pain-location">Pain location</Label>
-      <Input id="pain-location" size="$4" borderWidth={2} />
+      <Input
+        id="pain-location"
+        size="$4"
+        borderWidth={2}
+        onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+          setPainLocationInput(e.target.value)
+        }
+      />
 
       <Label htmlFor="pain-level">Pain level</Label>
       <Slider
         id="pain-level"
         size="$4"
-        defaultValue={[initialPainLevel]}
         max={10}
         step={1}
         onValueChange={(e) => setPainLevel(e[0])}
@@ -53,7 +66,22 @@ export default function State() {
       <YStack gap="$4" id="pain-type">
         {painTypes.map((painType) => (
           <XStack key={painType} gap="$4" alignItems="center">
-            <Checkbox id={painType} value={painType} size="$6">
+            <Checkbox
+              id={painType}
+              value={painType}
+              size="$6"
+              onCheckedChange={(isChecked) => {
+                if (isChecked) {
+                  setPainTypeInput((prev) => [...prev, painType]);
+                } else {
+                  setPainTypeInput((prev) =>
+                    [...prev].filter(
+                      (addedPainType) => addedPainType !== painType,
+                    ),
+                  );
+                }
+              }}
+            >
               <Checkbox.Indicator>
                 <CheckIcon />
               </Checkbox.Indicator>
@@ -66,9 +94,44 @@ export default function State() {
       </YStack>
 
       <Label htmlFor="pain-trigger">Trigger:</Label>
-      <TextArea id="pain-trigger" size="$4" borderWidth={2} />
+      <TextArea
+        id="pain-trigger"
+        size="$4"
+        borderWidth={2}
+        onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+          setPainTriggerInput(e.target.value)
+        }
+      />
 
-      <Button>Add log</Button>
+      <Button
+        onPress={async () => {
+          console.log("clicked");
+          if (
+            !painLocationInput &&
+            !painLevel &&
+            !formattedPainTypeInput &&
+            !painTriggerInput
+          ) {
+            console.log("all values are empty");
+          }
+
+          const statement = await db.prepareAsync(`
+            INSERT INTO ${table.state.name} (painLocation, painLevel, painType, painTrigger) VALUES ($painLocationInput, $painLevel, $formattedPainTypeInput, $painTriggerInput);
+          `);
+          try {
+            const result = await statement.executeAsync({
+              $painLocationInput: painLocationInput,
+              $painLevel: String(painLevel),
+              $formattedPainTypeInput: formattedPainTypeInput,
+              $painTriggerInput: painTriggerInput,
+            });
+          } finally {
+            await statement.finalizeAsync();
+          }
+        }}
+      >
+        Add log
+      </Button>
     </LogView>
   );
 }
