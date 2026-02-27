@@ -10,10 +10,12 @@ import {
   Checkbox,
   TextArea,
   Text,
+  AlertDialog,
 } from "tamagui";
 import { LogView } from "@/components/logView";
 import { useSQLiteContext } from "expo-sqlite";
 import { table } from "@/lib/db";
+import { useRouter } from "expo-router";
 
 const painTypes = [
   "sharp",
@@ -28,12 +30,32 @@ const painTypes = [
 
 export default function State() {
   const db = useSQLiteContext();
+  const router = useRouter();
   const [painLocationInput, setPainLocationInput] = useState("");
   const [painLevel, setPainLevel] = useState<number>();
   const [painTypeInput, setPainTypeInput] = useState<string[]>([]);
   const [painTriggerInput, setPainTriggerInput] = useState("");
 
   const formattedPainTypeInput = painTypeInput.join(", ");
+
+  const allFieldsEmpty =
+    !painLocationInput &&
+    !painLevel &&
+    !formattedPainTypeInput &&
+    !painTriggerInput;
+
+  const desc = () => (
+    <YStack gap="$2">
+      {allFieldsEmpty
+        ? "At least one field needs to be filled"
+        : `
+        Pain Location: ${painLocationInput || "—"}\n
+        Pain Level: ${painLevel || "—"}/10\n
+        Pain Type: ${formattedPainTypeInput || "—"}\n
+        Trigger: ${painTriggerInput || "—"}
+        `}
+    </YStack>
+  );
 
   return (
     <LogView>
@@ -103,35 +125,49 @@ export default function State() {
         }
       />
 
-      <Button
-        onPress={async () => {
-          console.log("clicked");
-          if (
-            !painLocationInput &&
-            !painLevel &&
-            !formattedPainTypeInput &&
-            !painTriggerInput
-          ) {
-            console.log("all values are empty");
-          }
+      <AlertDialog native>
+        <AlertDialog.Trigger asChild>
+          <Button>Add log</Button>
+        </AlertDialog.Trigger>
+        <AlertDialog.Portal>
+          <AlertDialog.Overlay key="overlay" />
+          <AlertDialog.Content>
+            <AlertDialog.Title>
+              {allFieldsEmpty ? "Empty Fields" : "Confirm Entry"}
+            </AlertDialog.Title>
+            <AlertDialog.Description>{desc()}</AlertDialog.Description>
+            <XStack gap="$3" justifyContent="flex-end">
+              <AlertDialog.Cancel asChild>
+                <Button variant="outlined">Dismiss</Button>
+              </AlertDialog.Cancel>
+              {!allFieldsEmpty && (
+                <AlertDialog.Action
+                  asChild
+                  onPress={async () => {
+                    const statement = await db.prepareAsync(`
+              INSERT INTO ${table.state.name} (painLocation, painLevel, painType, painTrigger) VALUES ($painLocationInput, $painLevel, $formattedPainTypeInput, $painTriggerInput);
+            `);
 
-          const statement = await db.prepareAsync(`
-            INSERT INTO ${table.state.name} (painLocation, painLevel, painType, painTrigger) VALUES ($painLocationInput, $painLevel, $formattedPainTypeInput, $painTriggerInput);
-          `);
-          try {
-            const result = await statement.executeAsync({
-              $painLocationInput: painLocationInput,
-              $painLevel: String(painLevel),
-              $formattedPainTypeInput: formattedPainTypeInput,
-              $painTriggerInput: painTriggerInput,
-            });
-          } finally {
-            await statement.finalizeAsync();
-          }
-        }}
-      >
-        Add log
-      </Button>
+                    try {
+                      await statement.executeAsync({
+                        $painLocationInput: painLocationInput,
+                        $painLevel: String(painLevel),
+                        $formattedPainTypeInput: formattedPainTypeInput,
+                        $painTriggerInput: painTriggerInput,
+                      });
+                      router.navigate("/");
+                    } finally {
+                      await statement.finalizeAsync();
+                    }
+                  }}
+                >
+                  <Button>Confirm</Button>
+                </AlertDialog.Action>
+              )}
+            </XStack>
+          </AlertDialog.Content>
+        </AlertDialog.Portal>
+      </AlertDialog>
     </LogView>
   );
 }
