@@ -1,14 +1,54 @@
-import { Input, Button, Label, XStack, RadioGroup } from "tamagui";
+import {
+  Input,
+  Button,
+  Label,
+  XStack,
+  RadioGroup,
+  YStack,
+  AlertDialog,
+} from "tamagui";
 import { LogView } from "@/components/logView";
 import { useState } from "react";
+import { useSQLiteContext } from "expo-sqlite";
+import { useRouter } from "expo-router";
+import { table } from "@/lib/db";
 
-const workoutIntensity = { 1: "light", 2: "medium", 3: "hard" };
+const workoutIntensity: { [key: number]: string } = {
+  1: "light",
+  2: "medium",
+  3: "hard",
+};
 
 export default function Workout() {
+  const db = useSQLiteContext();
+  const router = useRouter();
+
   const [workoutType, setWorkoutType] = useState("");
   const [intensity, setIntensity] = useState("");
   const [duration, setDuration] = useState("");
   const [notes, setNotes] = useState("");
+
+  const allFieldsEmpty = !workoutType && !intensity && !duration && !notes;
+
+  const desc = () => {
+    const intensityLabel =
+      intensity && workoutIntensity[Number(intensity)]
+        ? workoutIntensity[Number(intensity)]
+        : "—";
+
+    return (
+      <YStack gap="$2">
+        {allFieldsEmpty
+          ? "At least one field needs to be filled"
+          : `
+        Workout Type: ${workoutType || "—"}\n
+        Workout Intensity: ${intensityLabel}\n
+        Workout Duration: ${duration || "—"}\n
+        Workout Notes: ${notes || "—"}
+        `}
+      </YStack>
+    );
+  };
 
   return (
     <LogView>
@@ -55,7 +95,51 @@ export default function Workout() {
         onChangeText={setNotes}
       />
 
-      <Button>Add log</Button>
+      <AlertDialog native>
+        <AlertDialog.Trigger asChild>
+          <Button>Add log</Button>
+        </AlertDialog.Trigger>
+        <AlertDialog.Portal>
+          <AlertDialog.Overlay key="overlay" />
+          <AlertDialog.Content>
+            <AlertDialog.Title>
+              {allFieldsEmpty ? "Empty Fields" : "Confirm Entry"}
+            </AlertDialog.Title>
+            <AlertDialog.Description>{desc()}</AlertDialog.Description>
+            <XStack gap="$3" justifyContent="flex-end">
+              <AlertDialog.Cancel asChild>
+                <Button variant="outlined">Dismiss</Button>
+              </AlertDialog.Cancel>
+              {!allFieldsEmpty && (
+                <AlertDialog.Action
+                  asChild
+                  onPress={async () => {
+                    const statement = await db.prepareAsync(
+                      `
+                        INSERT INTO ${table.workout.name} (workoutType, workoutIntensity, workoutDuration, workoutNotes) VALUES ($workoutType, $workoutIntensity, $workoutDuration, $workoutNotes);
+                      `,
+                    );
+
+                    try {
+                      await statement.executeAsync({
+                        $workoutType: workoutType,
+                        $workoutIntensity: Number(intensity),
+                        $workoutDuration: Number(duration),
+                        $workoutNotes: notes,
+                      });
+                      router.navigate("/");
+                    } finally {
+                      await statement.finalizeAsync();
+                    }
+                  }}
+                >
+                  <Button>Confirm</Button>
+                </AlertDialog.Action>
+              )}
+            </XStack>
+          </AlertDialog.Content>
+        </AlertDialog.Portal>
+      </AlertDialog>
     </LogView>
   );
 }
