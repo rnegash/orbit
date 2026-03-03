@@ -75,15 +75,14 @@ export default function LogList() {
       data={events}
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => (
-        <XStack gap="$3" alignItems="flex-start" marginBottom="$3">
-          <View
-            style={{
-              width: 4,
-              backgroundColor: item.type === "workout" ? "#3b82f6" : "#ef4444",
-              marginTop: 4,
-            }}
-          />
-          <YStack gap="$1" flex={1}>
+        <XStack
+          borderLeftWidth={2}
+          borderLeftColor={item.type === "workout" ? "#3b82f6" : "#ef4444"}
+          gap="$3"
+          alignItems="flex-start"
+          marginBottom="$3"
+        >
+          <YStack gap="$1" padding={"$3"}>
             <Text fontWeight="700">{item.title}</Text>
             <Text fontSize="$2" color="$gray10">
               {item.subtitle}
