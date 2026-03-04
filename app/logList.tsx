@@ -35,31 +35,33 @@ export default function LogList() {
         createdAt: string | null;
       }>("SELECT * FROM workoutLog");
 
-      const painEvents = painRows.map((row) => ({
-        id: `pain-${row.id}`,
-        type: "pain" as const,
-        createdAt: row.createdAt ?? "",
-        title: `Pain – ${row.painLocation || "Unknown location"}`,
-        subtitle: `Level: ${
-          row.painLevel ?? "—"
-        }/10 • Type: ${row.painType || "—"} • Trigger: ${
-          row.painTrigger || "—"
-        }`,
-      }));
+      const painEvents =
+        painRows?.map((row) => ({
+          id: `pain-${row.id}`,
+          type: "pain" as const,
+          createdAt: row.createdAt ?? "",
+          title: `Pain – ${row.painLocation || "Unknown location"}`,
+          subtitle: `Level: ${
+            row.painLevel ?? "—"
+          }/10 • Type: ${row.painType || "—"} • Trigger: ${
+            row.painTrigger || "—"
+          }`,
+        })) || [];
 
-      const workoutEvents = workoutRows.map((row) => ({
-        id: `workout-${row.id}`,
-        type: "workout" as const,
-        createdAt: row.createdAt ?? "",
-        title: `Workout – ${row.workoutType || "Unnamed"}`,
-        subtitle: `Intensity: ${
-          row.workoutIntensity ?? "—"
-        } • Duration: ${row.workoutDuration ?? "—"} min • Notes: ${
-          row.workoutNotes || "—"
-        }`,
-      }));
+      const workoutEvents =
+        workoutRows?.map((row) => ({
+          id: `workout-${row.id}`,
+          type: "workout" as const,
+          createdAt: row.createdAt ?? "",
+          title: `Workout – ${row.workoutType || "Unnamed"}`,
+          subtitle: `Intensity: ${
+            row.workoutIntensity ?? "—"
+          } • Duration: ${row.workoutDuration ?? "—"} min • Notes: ${
+            row.workoutNotes || "—"
+          }`,
+        })) || [];
 
-      const merged = [...painEvents, ...workoutEvents].sort((a, b) =>
+      const merged = [...painEvents, ...workoutEvents]?.sort((a, b) =>
         a.createdAt < b.createdAt ? 1 : a.createdAt > b.createdAt ? -1 : 0,
       );
 
@@ -68,6 +70,14 @@ export default function LogList() {
 
     load();
   }, [db]);
+
+  if (events?.length === 0) {
+    return (
+      <View style={{ padding: 16 }}>
+        <Text>No events found</Text>
+      </View>
+    );
+  }
 
   return (
     <FlatList
